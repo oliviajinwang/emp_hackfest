@@ -27,8 +27,8 @@ with text_col2:
         By using AI to predict which species are most at risk, we can help park rangers and conservationists
         prioritize their efforts and protect our wild spaces for generations to come.
     """)
-    if st.button("Get Involved"):
-        st.switch_page("tabs/cta.py")
+    if st.button("Species Analytics"):
+        st.switch_page("tabs/categories.py")
 
 _, image_col1, _, image_col2, _ = st.columns([0.2, 1, 0.4, 1, 0.2])
 
@@ -44,7 +44,7 @@ st.divider()
 cols = st.columns(4)
 cols[0].metric("Parks Covered", "56")
 cols[1].metric("Species Tracked", "100,000+")
-cols[2].metric("AI Accuracy", "89%")
+cols[2].metric("Intelligence", "AI-Powered Predictions")
 cols[3].metric("Risk Species", "558 Active")
 st.divider()
 

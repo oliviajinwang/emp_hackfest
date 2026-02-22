@@ -5,9 +5,10 @@ st.logo("https://pbs.twimg.com/media/GRBDcDFaYAA0yPt.jpg", size="large")
 
 home_page = st.Page(page="tabs/homepage.py", title="Home", default=True)
 map_page = st.Page(page="tabs/map.py", title="Map", default=False)
+categores_page = st.Page(page="tabs/categories.py", title="Species Analytics", default=False)
 cta_page = st.Page(page="tabs/cta.py", title="Get Involved", default=False)
 
-pg = st.navigation([home_page, map_page, cta_page])
+pg = st.navigation([home_page, map_page, categores_page, cta_page])
 st.set_page_config(page_title="Park Guardian", layout="wide")
 set_theme()
 pg.run()
