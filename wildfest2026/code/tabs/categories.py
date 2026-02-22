@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 
-from tabs.map import load_data
+from utils import load_data
 
 def species_analytics_tab(species_df):
     st.title("Species Distribution and Statistics")

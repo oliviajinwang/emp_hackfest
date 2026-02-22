@@ -5,6 +5,7 @@ import folium
 from folium import Element
 import json
 from ai_predictor import train_model, predict_species_risk
+from utils import load_data
 import numpy as np
 
 # 1. Page Configuration
@@ -17,14 +18,6 @@ if 'selected_park_name' not in st.session_state:
 @st.cache_resource
 def get_ai_model(species_df, parks_df):
     return train_model(species_df, parks_df)
-
-# 2. Data Loading (Local CSVs)
-@st.cache_data
-def load_data():
-    # Replace these filenames with your actual local file paths
-    parks_df = pd.read_csv('data/national-parks.csv')
-    species_df = pd.read_csv('data/national-park-species.csv')
-    return parks_df, species_df
 
 def process_baseline_metrics(parks_df, species_df):
     # Species Per Park
@@ -52,13 +45,7 @@ try:
     st.sidebar.info("Analyze and predict biodiversity health across US National Parks.")
     map_mode = st.sidebar.radio("Map Color Represents: ", ["Total Species", "Biodiversity Density"])
     
-    # Filter for Species Categories
-    # categories = species['Category'].unique().tolist()
-    # selected_cats = st.sidebar.multiselect("Filter by Species Category", categories, default=categories[:3])
-    
-    # Filter for Conservation Status
-    # status = species['Conservation Status'].dropna().unique().tolist()
-    # selected_status = st.sidebar.multiselect("Conservation Status", status, default=status)
+
 
     # 4. KPI Header
     st.title("National Park Guardian Interactive Map")

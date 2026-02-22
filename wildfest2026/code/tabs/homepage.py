@@ -41,7 +41,7 @@ with image_col2:
              caption="Protecting our Wild Spaces")
 
 st.divider()
-cols = st.columns(4)
+cols = st.columns([1, 1, 2, 1])
 cols[0].metric("Parks Covered", "56")
 cols[1].metric("Species Tracked", "100,000+")
 cols[2].metric("Intelligence", "AI-Powered Predictions")
