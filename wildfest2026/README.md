@@ -13,6 +13,10 @@ Yutang Xie, Grade 10 (Class of 2028), International Community School
 
 Both authors are equal contributors of this project.
 
+## Video Demo
+
+[![National Park Guardian AI Dashboard Demo](https://img.youtube.com/vi/OkV3xOn7RiI/0.jpg)](https://www.youtube.com/watch?v=OkV3xOn7RiI)
+
 ## Features
 - Home page that includes our about-us and our mission
 - Interactive map of total number of species per national park
