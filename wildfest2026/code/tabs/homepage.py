@@ -1,10 +1,9 @@
 import streamlit as st
 
-# make sure to revise before submission
-
 st.title("Welcome to National Park Guardian AI", text_alignment="center")
 st.write("### Predicting the Future of Biodiversity in US National Parks, using AI to monitor National Park health and the safety of at-risk species.")
 
+# Set page configuration for a wide layout and custom title/icon
 st.set_page_config(page_title="Park Guardian AI", layout="wide", page_icon="🌲")
 
 text_col1, text_col2 = st.columns(2)

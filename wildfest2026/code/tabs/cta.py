@@ -19,4 +19,5 @@ email = st.text_input("Enter your email to get conservation alerts")
 if st.button("Become a Guardian"):
     st.success(f"Thank you for joining the Guardian Network! Alerts will be sent to {email}.")
     with open("data/emails.jsonl", "a") as f:
+        # Append the email to a JSONL file for future use
         f.write(json.dumps({"email": email}) + "\n")

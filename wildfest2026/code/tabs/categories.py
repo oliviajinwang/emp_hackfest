@@ -3,6 +3,7 @@ import plotly.express as px
 
 from utils import load_data
 
+# Logic and data cleaning for the Species Analytics tab
 def species_analytics_tab(species_df):
     st.title("Species Distribution and Statistics")
     st.write("Explore the distribution of species across different parks and categories.")
@@ -48,6 +49,7 @@ def species_analytics_tab(species_df):
 
     st.plotly_chart(fig_status, use_container_width=True)
 
+    # Display key statistics at the bottom of the page
     m1, m2, m3 = st.columns(3)
     with m1:
         st.metric("Total Species", f"{len(species_df):,}")
@@ -59,6 +61,7 @@ def species_analytics_tab(species_df):
         top_cat = cat_counts.iloc[0]['Category'] if not cat_counts.empty else "N/A"
         st.metric("Most Common Category", top_cat)
 
+# Attempt to load data and display the species analytics tab, with error handling for missing files
 try:
     _, species = load_data()
     species_analytics_tab(species)
