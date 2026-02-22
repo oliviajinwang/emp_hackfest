@@ -8,7 +8,9 @@ To combat this, we decided on a small web app for park rangers that identifies t
 
 ## Authors
 Olivia Wang, Grade 10 (Class of 2028), International Community School
+
 Yutang Xie, Grade 10 (Class of 2028), International Community School
+
 Both authors are equal contributors of this project.
 
 ## Features
