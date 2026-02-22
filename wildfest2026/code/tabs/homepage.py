@@ -45,6 +45,6 @@ cols = st.columns([1, 1, 2, 1])
 cols[0].metric("Parks Covered", "56")
 cols[1].metric("Species Tracked", "100,000+")
 cols[2].metric("Intelligence", "AI-Powered Predictions")
-cols[3].metric("Risk Species", "558 Active")
+cols[3].metric("Risk Species", "2800+")
 st.divider()
 
