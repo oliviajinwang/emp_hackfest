@@ -5,6 +5,7 @@ import folium
 from folium import Element
 import json
 from ai_predictor import train_model, predict_species_risk
+import numpy as np
 
 # 1. Page Configuration
 st.set_page_config(page_title="Park Guardian AI", layout="wide", page_icon="🌲")
@@ -14,8 +15,8 @@ if 'selected_park_name' not in st.session_state:
     st.session_state.selected_park_name = None
 
 @st.cache_resource
-def get_ai_model(data):
-    return train_model(data)
+def get_ai_model(species_df, parks_df):
+    return train_model(species_df, parks_df)
 
 # 2. Data Loading (Local CSVs)
 @st.cache_data
@@ -33,7 +34,10 @@ def process_baseline_metrics(parks_df, species_df):
     merged_df = pd.merge(parks_df, species_counts, on='Park Name')
 
     # Calculate Density
-    merged_df['Biodiversity Density'] = merged_df['Species Count'] / merged_df['Acres']
+    merged_df['Biodiversity Density'] = merged_df['Species Count'] / merged_df['Acres'] * 1000
+
+    upper_limit = merged_df['Biodiversity Density'].quantile(1)
+    merged_df['Visual_Biodiversity_Density'] = merged_df['Biodiversity Density'].clip(upper=upper_limit)
 
     return merged_df
 
@@ -41,7 +45,7 @@ try:
     parks, species = load_data()
     merged = process_baseline_metrics(parks, species)
 
-    ai_model, encoders = get_ai_model(species)
+    ai_model, encoders = get_ai_model(species, parks)
     
     # 3. Sidebar Setup
     st.sidebar.title("Filters & Options")
@@ -49,15 +53,15 @@ try:
     map_mode = st.sidebar.radio("Map Color Represents: ", ["Total Species", "Biodiversity Density"])
     
     # Filter for Species Categories
-    categories = species['Category'].unique().tolist()
-    selected_cats = st.sidebar.multiselect("Filter by Species Category", categories, default=categories[:3])
+    # categories = species['Category'].unique().tolist()
+    # selected_cats = st.sidebar.multiselect("Filter by Species Category", categories, default=categories[:3])
     
     # Filter for Conservation Status
-    status = species['Conservation Status'].dropna().unique().tolist()
-    selected_status = st.sidebar.multiselect("Conservation Status", status, default=status)
+    # status = species['Conservation Status'].dropna().unique().tolist()
+    # selected_status = st.sidebar.multiselect("Conservation Status", status, default=status)
 
     # 4. KPI Header
-    st.title("National Park Guardian AI")
+    st.title("National Park Guardian Interactive Map")
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Parks Monitored", len(parks))
     col2.metric("Species Cataloged", f"{len(species):,}")
@@ -70,10 +74,12 @@ try:
     with map_col:
         st.subheader("Interactive Biodiversity Map")
         st.write("Each point represents a National Park. Size represents acreage.")
-        color_col = "Species Count" if map_mode == "Total Species" else "Biodiversity Density"
-        map_label = "Total Species" if map_mode == "Total Species" else "Biodiversity Density (Species per Acre)"
+        color_col = "Species Count" if map_mode == "Total Species" else "log_density"
+        map_label = "Total Species" if map_mode == "Total Species" else "Logarithmic Density per 1000 Acres"
 
         # Create the Plotly Map
+        merged["log_density"] = np.log10(merged['Visual_Biodiversity_Density'] + 1e-8)
+
         fig = px.scatter_map(
             merged, 
             lat="Latitude", 
@@ -83,6 +89,7 @@ try:
             size="Acres",
             color=color_col,
             color_continuous_scale="Viridis",
+            # hover_data={"Log Density": False, "Biodiversity Density": ':.'},
             size_max=40,
             color_discrete_sequence=["#2E7D32"], # Forest Green
             zoom=3, 
@@ -109,7 +116,7 @@ try:
 
     # side panel
     with panel_col:
-        st.subheader("Park Details")
+        st.header("Park Details")
         if st.session_state.selected_park_name:
             park_info = merged[merged['Park Name'] == st.session_state.selected_park_name].iloc[0]
             st.markdown(f"### {park_info['Park Name']}")
@@ -122,26 +129,23 @@ try:
                 st.rerun()
 
             st.divider()
-
-            st.subheader("AI Summary")
-            st.info("*AI model predcitions and conservation summaries with be generated here in Stage 3.*")
             
             park_name = st.session_state.selected_park_name
-            st.subheader(f"{park_name} AI Forecast")
+            st.subheader(f"{park_name} AI Forecast: top 10 most vulnerable species")
             park_species = species[species['Park Name'] == park_name].copy()
             
             risks = []
             for _, row in park_species.iterrows():
-                risk = predict_species_risk(ai_model, encoders, row['Category'], row['Abundance'])
+                risk = predict_species_risk(ai_model, encoders, row['Category'], row['Abundance'], park_info['Acres'], park_info['Biodiversity Density'])
                 risks.append(risk)
 
             park_species['risk_score'] = risks
-            top_five = park_species.sort_values(by="risk_score", ascending=False).head(5)
+            top_ten = park_species.sort_values(by="risk_score", ascending=False).head(10)
 
-            for _, row in top_five.iterrows():
+            for _, row in top_ten.iterrows():
                 risk = row['risk_score']
 
-                col_a, col_b = st.columns([3, 1])
+                col_a, col_b = st.columns([1, 1])
 
                 cleaned_name = str(row['Common Names']).split(',')[0]
                 col_a.write(f"**{cleaned_name}**")
@@ -149,7 +153,7 @@ try:
                 color = "red" if risk > 66 else "orange" if risk > 33 else "green"
                 col_b.markdown(f":{color}[{risk}%]")
 
-            st.caption("AI estimates vulnerability based on category and abundance trends.")
+            st.caption("AI estimates vulnerability based on category abundance trends and park-level metrics.")
         else:
             st.info("Click on a park on the map to see details and AI insights here.")
 

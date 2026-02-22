@@ -1,26 +1,37 @@
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
 import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
 
-def train_model(data):
-    # Prepare features and target variable
-    df = data.copy()
-    df['Abundance'] = df['Abundance'].fillna('Unknown')
+def train_model(species_df, parks_df):
+    # 1. Calculate Biodiversity Density on the park level first
+    # Density = Species Count / Acres
+    species_counts = species_df.groupby('Park Name').size().reset_index(name='Species_Count')
+    parks_with_metrics = pd.merge(parks_df, species_counts, on='Park Name')
+    parks_with_metrics['Biodiversity_Density'] = (parks_with_metrics['Species_Count'] / parks_with_metrics['Acres']) * 1000
+
+    # 2. Merge these park-level metrics back into the species list
+    df = pd.merge(species_df, parks_with_metrics[['Park Name', 'Acres', 'Biodiversity_Density']], on='Park Name', how='left')
     
-    # Encode categorical data into nubers
-    # Save enoders to transform user input later
+    # Fill missing values to prevent model crashes
+    df['Abundance'] = df['Abundance'].fillna('Unknown')
+    df['Acres'] = df['Acres'].fillna(df['Acres'].median())
+    df['Biodiversity_Density'] = df['Biodiversity_Density'].fillna(df['Biodiversity_Density'].median())
+    
+    # 3. Encode Categorical Data
     encoders = {}
     for col in ['Category', 'Abundance']:
         le = LabelEncoder()
         df[f'{col}_Enc'] = le.fit_transform(df[col])
         encoders[col] = le
 
-    # Define the Target
+    # 4. Define Target
     at_risk_statuses = ['Endangered', 'Threatened', 'Species of Concern']
     df['Is_At_Risk'] = df['Conservation Status'].isin(at_risk_statuses).astype(int)
 
-    # Train the Model
-    X = df[['Category_Enc', 'Abundance_Enc']]
+    # 5. Train with 4 features now
+    features = ['Category_Enc', 'Abundance_Enc', 'Acres', 'Biodiversity_Density']
+    X = df[features]
     y = df['Is_At_Risk']
 
     model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -28,19 +39,19 @@ def train_model(data):
 
     return model, encoders
 
-def predict_species_risk(model, encoders, category, abundance):
+def predict_species_risk(model, encoders, category, abundance, acres, density):
     try:
         cat_enc = encoders['Category'].transform([category])[0]
         abun_enc = encoders['Abundance'].transform([abundance])[0]
         
+        # DataFrame columns must match the order and names used in training
         X = pd.DataFrame(
-            [[cat_enc, abun_enc]], 
-            columns=['Category_Enc', 'Abundance_Enc']
+            [[cat_enc, abun_enc, acres, density]], 
+            columns=['Category_Enc', 'Abundance_Enc', 'Acres', 'Biodiversity_Density']
         )
 
-        # Probability for class '1' (At Risk)
+        # Get the probability of being 'At Risk' (Class 1)
         prob = model.predict_proba(X)[0][1] 
         return round(prob * 100, 1)
     except:
         return 0.0
-    

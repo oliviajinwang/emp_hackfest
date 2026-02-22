@@ -4,17 +4,17 @@ def set_theme():
     st.sidebar.title("Themes")
     
     themes = {
-        "Default (Light)": {"bg": "#FFFFFF", "text": "#31333F", "sidebar": "#F0F2F6", "accent": "#FF4B4B"},
+        "Ocean Blue": {"bg": "#001D3D", "text": "#E0E1DD", "sidebar": "#003566", "accent": "#FFC300"},
+        "Light": {"bg": "#FFFFFF", "text": "#31333F", "sidebar": "#F0F2F6", "accent": "#FF4B4B"},
         "Dark": {"bg": "#121212", "text": "#E0E0E0", "sidebar": "#1E1E1E", "accent": "#BB86FC"},
         "Forest Green": {"bg": "#0D1F0D", "text": "#E8F5E9", "sidebar": "#162B16", "accent": "#4CAF50"},
-        "Ocean Blue": {"bg": "#001D3D", "text": "#E0E1DD", "sidebar": "#003566", "accent": "#FFC300"},
         "Crimson Red": {"bg": "#2D0303", "text": "#F5E8E8", "sidebar": "#4A0606", "accent": "#FF4D4D"},
         "Solarized Yellow": {"bg": "#FDF6E3", "text": "#657B83", "sidebar": "#EEE8D5", "accent": "#B58900"}
     }
 
     theme_choice = st.sidebar.selectbox(
         "Choose a color theme", 
-        ["Default (Light)", "Dark", "Forest Green", "Ocean Blue", "Crimson Red", "Solarized Yellow"]
+        ["Ocean Blue", "Light", "Dark", "Forest Green", "Crimson Red", "Solarized Yellow"]
     )
 
     selected = themes[theme_choice]
