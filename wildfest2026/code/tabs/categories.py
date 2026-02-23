@@ -3,7 +3,7 @@ import plotly.express as px
 
 from utils import load_data
 
-# Logic and data cleaning for the Species Analytics tab
+# logic and data cleaning for the Species Analytics tab
 def species_analytics_tab(species_df):
     # Page title and description
     st.title("Species Distribution and Statistics")
@@ -18,7 +18,7 @@ def species_analytics_tab(species_df):
     filtered_df = species_df[species_df['Category'].isin(selected_categories)]
 
     st.subheader("Category Distribution")
-    # Calculate species count by category for the filtered data
+    # cat counts stores the count of species in each category after filtering
     cat_counts = filtered_df.groupby('Category').size().reset_index(name='Species_Count')
     # Sort categories by species count for better visualization
     cat_counts = cat_counts.sort_values(by='Species_Count', ascending=False)
@@ -39,7 +39,7 @@ def species_analytics_tab(species_df):
     st.divider()
     st.subheader("Conservation Status by Category")
 
-    # Group by Category and Conservation Status
+    # status_stats stores the count of species in each conservation status for each category
     status_stats = filtered_df.groupby(['Category', 'Conservation Status']).size().reset_index(name='Count')
 
     # Stacked bar chart of conservation status distribution by category

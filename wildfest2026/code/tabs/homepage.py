@@ -3,7 +3,7 @@ import streamlit as st
 st.title("Welcome to National Park Guardian AI", text_alignment="center")
 st.write("### Predicting the Future of Biodiversity in US National Parks, using AI to monitor National Park health and the safety of at-risk species.")
 
-# Set page configuration for a wide layout and custom title/icon
+# set page configuration for a wide layout and custom title/icon
 st.set_page_config(page_title="Park Guardian AI", layout="wide", page_icon="🌲")
 
 text_col1, text_col2 = st.columns(2)
@@ -42,8 +42,8 @@ with image_col2:
 st.divider()
 cols = st.columns([1, 1, 2, 1])
 cols[0].metric("Parks Covered", "56")
-cols[1].metric("Species Tracked", "100,000+")
+cols[1].metric("Species Tracked", "120,000")
 cols[2].metric("Intelligence", "AI-Powered Predictions")
-cols[3].metric("Risk Species", "2800+")
+cols[3].metric("Risk Species", "4400")
 st.divider()
 

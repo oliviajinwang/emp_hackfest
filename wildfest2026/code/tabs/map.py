@@ -61,10 +61,12 @@ try:
     with map_col:
         st.subheader("Interactive Biodiversity Map")
         st.write("Each point represents a National Park. Size represents acreage.")
+        # changes the color of the node based on the mode of the map
         color_col = "Species Count" if map_mode == "Total Species" else "log_density"
+        # map_label changes the label in the hover tooltip based on the mode of the map
         map_label = "Total Species" if map_mode == "Total Species" else "Logarithmic Density per 1000 Acres"
 
-        # Create the Plotly Map
+        # create the map w/ plotly
         merged["log_density"] = np.log10(merged['Visual_Biodiversity_Density'] + 1e-8)
 
         fig = px.scatter_map(
@@ -72,13 +74,13 @@ try:
             lat="Latitude", 
             lon="Longitude", 
             hover_name="Park Name",
+            # includes the state and acres when you hover over the node
             hover_data=["State", "Acres"],
             size="Acres",
             color=color_col,
             color_continuous_scale="Viridis",
-            # hover_data={"Log Density": False, "Biodiversity Density": ':.'},
             size_max=40,
-            color_discrete_sequence=["#2E7D32"], # Forest Green
+            color_discrete_sequence=["#2E7D32"],
             zoom=3, 
             height=1200,
             labels={color_col: map_label}
@@ -86,7 +88,9 @@ try:
 
         # Use open-source map tiles (does not require an API key)
         fig.update_layout(
+            # clean open-street map with borders but not too busy
             map_style="open-street-map",
+            # this limits the map to the continaer
             margin={"r":0,"t":0,"l":0,"b":0}
         )
 
@@ -105,7 +109,9 @@ try:
     with panel_col:
         st.header("Park Details")
         if st.session_state.selected_park_name:
+            # iloc gets the first row of the df
             park_info = merged[merged['Park Name'] == st.session_state.selected_park_name].iloc[0]
+            # asterisks for bold, double for bold in markdown
             st.markdown(f"### {park_info['Park Name']}")
             st.write(f"**State:** {park_info['State']}")
             st.write(f"**Acres:** {park_info['Acres']:,}")
@@ -120,10 +126,13 @@ try:
             # AI Predictions for Vulnerable Species
             park_name = st.session_state.selected_park_name
             st.subheader(f"{park_name} AI Forecast: top 10 most vulnerable species")
+            # park_species filters the species df to only include species found in the selected park 
             park_species = species[species['Park Name'] == park_name].copy()
             
             # Predict risk scores for each species in the park
             risks = []
+            # this for loop uses the ai model to predict the risk score for each species based on category
+            # abundance, and acres and biodiversity density
             for _, row in park_species.iterrows():
                 risk = predict_species_risk(ai_model, encoders, row['Category'], row['Abundance'], park_info['Acres'], park_info['Biodiversity Density'])
                 risks.append(risk)
@@ -139,7 +148,7 @@ try:
                 # Display species name and risk score with color coding
                 col_a, col_b = st.columns([1, 1])
 
-                # Clean up common names for display
+                # clean up common names for display
                 cleaned_name = str(row['Common Names']).split(',')[0]
                 col_a.write(f"**{cleaned_name}**")
 

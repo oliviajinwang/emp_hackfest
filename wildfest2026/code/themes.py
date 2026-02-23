@@ -1,10 +1,9 @@
 import streamlit as st
 
-# Custom theming function to apply user-selected color themes across the app
+# custom theming function to apply user-selected color themes across the app
 def set_theme():
     st.sidebar.title("Themes")
     
-    # Define a set of color themes with background, text, sidebar, and accent colors
     themes = {
         "Ocean Blue": {"bg": "#001D3D", "text": "#E0E1DD", "sidebar": "#003566", "accent": "#FFC300"},
         "Light": {"bg": "#FFFFFF", "text": "#31333F", "sidebar": "#F0F2F6", "accent": "#FF4B4B"},
@@ -14,13 +13,13 @@ def set_theme():
         "Solarized Yellow": {"bg": "#FDF6E3", "text": "#657B83", "sidebar": "#EEE8D5", "accent": "#B58900"}
     }
 
-    # User selects a theme from the sidebar dropdown
+    # user selects a theme from the sidebar dropdown
     theme_choice = st.sidebar.selectbox(
         "Choose a color theme", 
         ["Ocean Blue", "Light", "Dark", "Forest Green", "Crimson Red", "Solarized Yellow"]
     )
 
-    # Apply the selected theme's colors to the app using custom CSS
+    # apply the selected theme's colors to the app using custom CSS
     selected = themes[theme_choice]
     custom_css = f"""
         <style>
