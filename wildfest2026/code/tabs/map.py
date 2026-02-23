@@ -8,17 +8,20 @@ from ai_predictor import train_model, predict_species_risk
 from utils import load_data
 import numpy as np
 
-# 1. Page Configuration
 st.set_page_config(page_title="Park Guardian AI", layout="wide", page_icon="🌲")
 
 # Initialize Session State for the side panel
 if 'selected_park_name' not in st.session_state:
     st.session_state.selected_park_name = None
 
+# st saves it in the local memory, so we can cache the model to avoid retraining on every interaction
 @st.cache_resource
 def get_ai_model(species_df, parks_df):
     return train_model(species_df, parks_df)
 
+# this function processes the park and species data to calculate baseline metrics
+# like species count and biodiversity density, and also handles outliers in density
+# for better map visualization
 def process_baseline_metrics(parks_df, species_df):
     # Species Per Park
     species_counts = species_df.groupby('Park Name').size().reset_index(name='Species Count')
@@ -38,16 +41,13 @@ try:
     parks, species = load_data()
     merged = process_baseline_metrics(parks, species)
 
+    # Train AI Model
     ai_model, encoders = get_ai_model(species, parks)
     
-    # 3. Sidebar Setup
     st.sidebar.title("Filters & Options")
     st.sidebar.info("Analyze and predict biodiversity health across US National Parks.")
     map_mode = st.sidebar.radio("Map Color Represents: ", ["Total Species", "Biodiversity Density"])
-    
 
-
-    # 4. KPI Header
     st.title("National Park Guardian Interactive Map")
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Parks Monitored", len(parks))
@@ -117,26 +117,33 @@ try:
 
             st.divider()
             
+            # AI Predictions for Vulnerable Species
             park_name = st.session_state.selected_park_name
             st.subheader(f"{park_name} AI Forecast: top 10 most vulnerable species")
             park_species = species[species['Park Name'] == park_name].copy()
             
+            # Predict risk scores for each species in the park
             risks = []
             for _, row in park_species.iterrows():
                 risk = predict_species_risk(ai_model, encoders, row['Category'], row['Abundance'], park_info['Acres'], park_info['Biodiversity Density'])
                 risks.append(risk)
 
+            # Add risk scores to the DataFrame and get top 10 most vulnerable species
             park_species['risk_score'] = risks
             top_ten = park_species.sort_values(by="risk_score", ascending=False).head(10)
 
+            # Display top 10 species with risk scores
             for _, row in top_ten.iterrows():
                 risk = row['risk_score']
 
+                # Display species name and risk score with color coding
                 col_a, col_b = st.columns([1, 1])
 
+                # Clean up common names for display
                 cleaned_name = str(row['Common Names']).split(',')[0]
                 col_a.write(f"**{cleaned_name}**")
 
+                # Color code risk: red for >66%, orange for 33-66%, green for <33%
                 color = "red" if risk > 66 else "orange" if risk > 33 else "green"
                 col_b.markdown(f":{color}[{risk}%]")
 

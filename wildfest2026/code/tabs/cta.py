@@ -15,6 +15,7 @@ st.write("""
             Whether you're a park ranger, a local resident, or just a nature enthusiast, your contribution matters.
         """)
 
+# Call to Action: Email Sign-Up
 email = st.text_input("Enter your email to get conservation alerts")
 if st.button("Become a Guardian"):
     st.success(f"Thank you for joining the Guardian Network! Alerts will be sent to {email}.")

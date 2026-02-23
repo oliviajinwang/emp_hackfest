@@ -41,6 +41,7 @@ def train_model(species_df, parks_df):
 
 def predict_species_risk(model, encoders, category, abundance, acres, density):
     try:
+        # Encode the input features using the same encoders from training
         cat_enc = encoders['Category'].transform([category])[0]
         abun_enc = encoders['Abundance'].transform([abundance])[0]
         
