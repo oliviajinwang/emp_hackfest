@@ -1,4 +1,9 @@
-# EmP Hackfest 2026: Wildhack
+> [!NOTE]
+> We won the [EMP Hackfest 2026](https://emphackfest.org/current-event) with our National Park Guardian AI Project!
+> * Repo: [oliviajinwang/wildfest2026](https://github.com/oliviajinwang/emp_hackfest/tree/main/wildfest2026)
+> * 1st Place Winner Submission on DevPost: [National Park Guardian AI](https://devpost.com/software/national-park-guardian-ai)
+
+# National Park Guardian AI (project for EMP Hackfest 2026: WildHack)
 
 This is National Park Guardian AI, a small web application that seeks to protect wildlife through using an AI-driven interactive dashboard for managing wildlife in National Parks and brings awareness to wildlife conservation.
 
